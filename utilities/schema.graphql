@@ -1,0 +1,46 @@
+type User @withSubscription {
+    id      : ID!
+    username: String! @id @search(by: [regexp])
+    avatar  : String
+    status  : String
+    contacts: [User] @hasInverse(field: contacts)
+    chats   : [Chat] @hasInverse(field: members)
+    createdChat: [Chat]
+    active  : Boolean! @search
+}
+
+type Chat {
+    id      : ID!
+    title   : String! @id @search(by: [regexp])
+    logo : String
+    members : [User!]!
+    creator : User! @hasInverse(field: createdChat)
+    messages: [Message] @hasInverse(field: fromChat)
+}
+
+type Message  @withSubscription {
+    id      : ID!
+    content : Content!
+    author  : User!
+    fromChat: Chat!
+    postTime: DateTime!
+    read    : Boolean! @search
+}
+
+type Text {
+    id  : ID!
+    text: String! @search(by: [fulltext])
+}
+
+type File {
+    id  : ID!
+    path: String!
+}
+
+type FileWithText {
+    id  : ID!
+    text: String! @search(by: [fulltext])
+    path: String!
+}
+
+union Content = Text | File | FileWithText
